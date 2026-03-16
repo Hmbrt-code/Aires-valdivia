@@ -31,18 +31,6 @@ export default function Import() {
         post('/admin/usuarios/importar', { forceFormData: true });
     };
 
-    const downloadTemplate = () => {
-        // Semicolon separator for Excel in Spanish locale + UTF-8 BOM
-        const bom = '\uFEFF';
-        const csv = bom + 'nombre;email;contraseña;rol\nJuan Pérez;juan@ejemplo.cl;password123;vecino\nMaría López;maria@ejemplo.cl;password456;admin\n';
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'plantilla_usuarios.csv';
-        a.click();
-        URL.revokeObjectURL(url);
-    };
 
     return (
         <AppLayout title="Importar Usuarios">
@@ -77,12 +65,12 @@ export default function Import() {
                             <h3 className="text-sm font-semibold text-gray-800 mb-1">Formato del archivo CSV</h3>
                             <p className="text-xs text-gray-500">Una fila por usuario. La primera fila debe ser el encabezado.</p>
                         </div>
-                        <button
-                            onClick={downloadTemplate}
+                        <a
+                            href="/admin/usuarios/plantilla"
                             className="text-xs text-blue-600 hover:text-blue-800 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors"
                         >
                             Descargar plantilla
-                        </button>
+                        </a>
                     </div>
 
                     <div className="overflow-x-auto">

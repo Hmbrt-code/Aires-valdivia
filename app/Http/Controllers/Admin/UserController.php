@@ -86,6 +86,41 @@ class UserController extends Controller
             ->with('success', 'Usuario eliminado exitosamente.');
     }
 
+    public function downloadTemplate()
+    {
+        $html = '
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+<head><meta charset="UTF-8"></head>
+<body>
+<table>
+<tr>
+  <th>nombre</th>
+  <th>email</th>
+  <th>contraseña</th>
+  <th>rol</th>
+</tr>
+<tr>
+  <td>Juan Pérez</td>
+  <td>juan@ejemplo.cl</td>
+  <td>password123</td>
+  <td>vecino</td>
+</tr>
+<tr>
+  <td>María López</td>
+  <td>maria@ejemplo.cl</td>
+  <td>password456</td>
+  <td>admin</td>
+</tr>
+</table>
+</body></html>';
+
+        return response($html, 200, [
+            'Content-Type'        => 'application/vnd.ms-excel; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="plantilla_usuarios.xls"',
+            'Cache-Control'       => 'no-cache',
+        ]);
+    }
+
     public function importForm()
     {
         return Inertia::render('Admin/Usuarios/Import');

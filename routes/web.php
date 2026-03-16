@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('usuarios/importar', [UserController::class, 'importForm'])->name('usuarios.import.form');
         Route::post('usuarios/importar', [UserController::class, 'importCsv'])->name('usuarios.import');
+        Route::get('usuarios/plantilla', [UserController::class, 'downloadTemplate'])->name('usuarios.template');
         Route::resource('usuarios', UserController::class)->parameters([
             'usuarios' => 'usuario',
         ]);
