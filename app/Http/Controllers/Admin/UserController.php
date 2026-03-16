@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -85,12 +86,48 @@ class UserController extends Controller
             ->with('success', 'Usuario eliminado exitosamente.');
     }
 
+    public function downloadTemplate()
+    {
+        $rows = [
+            ['nombre', 'email', 'contraseña', 'rol'],
+            ['Juan Pérez', 'juan@ejemplo.cl', 'password123', 'usuario'],
+            ['María López', 'maria@ejemplo.cl', 'password456', 'admin'],
+        ];
+
+        $xmlRows = '';
+        foreach ($rows as $row) {
+            $cells = '';
+            foreach ($row as $value) {
+                $escaped = htmlspecialchars((string) $value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+                $cells .= "<Cell><Data ss:Type=\"String\">{$escaped}</Data></Cell>";
+            }
+            $xmlRows .= "<Row>{$cells}</Row>\n";
+        }
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Worksheet ss:Name="Usuarios">
+    <Table>
+' . $xmlRows . '    </Table>
+  </Worksheet>
+</Workbook>';
+
+        return response($xml, 200, [
+            'Content-Type'        => 'application/vnd.ms-excel; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="plantilla_usuarios.xls"',
+            'Cache-Control'       => 'no-cache, no-store, must-revalidate',
+            'Pragma'              => 'no-cache',
+        ]);
+    }
+
     public function importForm()
     {
         return Inertia::render('Admin/Usuarios/Import');
     }
 
-    public function importCsv(\Illuminate\Http\Request $request)
+    public function importCsv(Request $request)
     {
         $request->validate([
             'csv' => ['required', 'file', 'mimes:csv,txt,xls,xml', 'max:2048'],
