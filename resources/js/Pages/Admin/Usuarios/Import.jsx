@@ -34,7 +34,7 @@ export default function Import({ result }) {
                         <div className="flex items-center justify-between mb-2">
                             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Formato del archivo</p>
                             <a
-                                href="/ejemplos/usuarios.csv"
+                                href="/ejemplos/usuarios.xls"
                                 download
                                 className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium"
                             >

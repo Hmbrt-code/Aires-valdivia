@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Worksheet ss:Name="Usuarios">
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">name</Data></Cell>
+        <Cell><Data ss:Type="String">email</Data></Cell>
+        <Cell><Data ss:Type="String">password</Data></Cell>
+        <Cell><Data ss:Type="String">role</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Juan Pérez</Data></Cell>
+        <Cell><Data ss:Type="String">juan.perez@ejemplo.cl</Data></Cell>
+        <Cell><Data ss:Type="String">password123</Data></Cell>
+        <Cell><Data ss:Type="String">user</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">María González</Data></Cell>
+        <Cell><Data ss:Type="String">maria.gonzalez@ejemplo.cl</Data></Cell>
+        <Cell><Data ss:Type="String">password123</Data></Cell>
+        <Cell><Data ss:Type="String">user</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Carlos Administrador</Data></Cell>
+        <Cell><Data ss:Type="String">carlos.admin@ejemplo.cl</Data></Cell>
+        <Cell><Data ss:Type="String">password123</Data></Cell>
+        <Cell><Data ss:Type="String">admin</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Ana López</Data></Cell>
+        <Cell><Data ss:Type="String">ana.lopez@ejemplo.cl</Data></Cell>
+        <Cell><Data ss:Type="String">clave1234</Data></Cell>
+        <Cell><Data ss:Type="String">user</Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>
