@@ -5,6 +5,7 @@ use App\Http\Controllers\MinuteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectUpdateController;
+use App\Http\Controllers\VecinoController;
 use App\Models\Minute;
 use App\Models\Project;
 use App\Models\ProjectUpdate;
@@ -31,23 +32,46 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Proyectos
-    Route::resource('proyectos', ProjectController::class)->parameters([
-        'proyectos' => 'proyecto',
-    ]);
+    // Proyectos — escritura primero (create/edit específicos antes que {proyecto})
+    Route::resource('proyectos', ProjectController::class)
+        ->parameters(['proyectos' => 'proyecto'])
+        ->except(['index', 'show'])
+        ->middleware('role:admin');
+    Route::resource('proyectos', ProjectController::class)
+        ->parameters(['proyectos' => 'proyecto'])
+        ->only(['index', 'show']);
 
     // Minutas
-    Route::resource('minutas', MinuteController::class)->parameters([
-        'minutas' => 'minuta',
-    ]);
+    Route::resource('minutas', MinuteController::class)
+        ->parameters(['minutas' => 'minuta'])
+        ->except(['index', 'show'])
+        ->middleware('role:admin');
+    Route::resource('minutas', MinuteController::class)
+        ->parameters(['minutas' => 'minuta'])
+        ->only(['index', 'show']);
 
     // Avances
-    Route::resource('avances', ProjectUpdateController::class)->parameters([
-        'avances' => 'avance',
-    ]);
+    Route::resource('avances', ProjectUpdateController::class)
+        ->parameters(['avances' => 'avance'])
+        ->except(['index', 'show'])
+        ->middleware('role:admin');
+    Route::resource('avances', ProjectUpdateController::class)
+        ->parameters(['avances' => 'avance'])
+        ->only(['index', 'show']);
+
+    // Vecinos
+    Route::resource('vecinos', VecinoController::class)
+        ->parameters(['vecinos' => 'vecino'])
+        ->except(['index', 'show'])
+        ->middleware('role:admin');
+    Route::resource('vecinos', VecinoController::class)
+        ->parameters(['vecinos' => 'vecino'])
+        ->only(['index', 'show']);
 
     // Admin
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+        Route::get('usuarios/importar', [UserController::class, 'importForm'])->name('usuarios.import.form');
+        Route::post('usuarios/importar', [UserController::class, 'importCsv'])->name('usuarios.import');
         Route::resource('usuarios', UserController::class)->parameters([
             'usuarios' => 'usuario',
         ]);
