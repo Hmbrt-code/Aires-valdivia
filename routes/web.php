@@ -32,14 +32,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Proyectos — escritura primero (create/edit específicos antes que {proyecto})
+    // Proyectos
     Route::resource('proyectos', ProjectController::class)
         ->parameters(['proyectos' => 'proyecto'])
         ->except(['index', 'show'])
         ->middleware('role:admin');
     Route::resource('proyectos', ProjectController::class)
         ->parameters(['proyectos' => 'proyecto'])
-        ->only(['index', 'show']);
+        ->only(['index', 'show'])
+        ->whereNumber('proyecto');
 
     // Minutas
     Route::resource('minutas', MinuteController::class)
@@ -48,7 +49,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:admin');
     Route::resource('minutas', MinuteController::class)
         ->parameters(['minutas' => 'minuta'])
-        ->only(['index', 'show']);
+        ->only(['index', 'show'])
+        ->whereNumber('minuta');
 
     // Avances
     Route::resource('avances', ProjectUpdateController::class)
@@ -57,7 +59,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:admin');
     Route::resource('avances', ProjectUpdateController::class)
         ->parameters(['avances' => 'avance'])
-        ->only(['index', 'show']);
+        ->only(['index', 'show'])
+        ->whereNumber('avance');
 
     // Vecinos
     Route::resource('vecinos', VecinoController::class)
@@ -66,12 +69,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:admin');
     Route::resource('vecinos', VecinoController::class)
         ->parameters(['vecinos' => 'vecino'])
-        ->only(['index', 'show']);
+        ->only(['index', 'show'])
+        ->whereNumber('vecino');
 
     // Admin
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('usuarios/importar', [UserController::class, 'importForm'])->name('usuarios.import.form');
         Route::post('usuarios/importar', [UserController::class, 'importCsv'])->name('usuarios.import');
+        Route::get('usuarios/plantilla', [UserController::class, 'downloadTemplate'])->name('usuarios.template');
         Route::resource('usuarios', UserController::class)->parameters([
             'usuarios' => 'usuario',
         ]);
