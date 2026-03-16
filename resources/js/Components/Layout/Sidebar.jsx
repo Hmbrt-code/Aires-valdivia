@@ -57,7 +57,7 @@ export default function Sidebar() {
             : currentPath.startsWith(href);
 
     return (
-        <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
+        <aside className="w-64 h-screen sticky top-0 bg-gray-900 text-white flex flex-col">
             <div className="px-6 py-5 border-b border-gray-700/60 flex items-center justify-center">
                 <img
                     src="/images/logo.png"
@@ -66,7 +66,7 @@ export default function Sidebar() {
                 />
             </div>
 
-            <nav className="flex-1 px-3 py-4 space-y-0.5">
+            <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
                 {navItems.map(item => (
                     <Link
                         key={item.href}
