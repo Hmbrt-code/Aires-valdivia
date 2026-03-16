@@ -1,12 +1,17 @@
 import AppLayout from '@/Components/Layout/AppLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+const toDateInput = (val) => {
+    if (!val) return '';
+    return val.slice(0, 10); // YYYY-MM-DD
+};
+
 export default function Edit({ project }) {
     const { data, setData, put, processing, errors } = useForm({
         name: project.name,
         description: project.description ?? '',
         status: project.status,
-        start_date: project.start_date,
+        start_date: toDateInput(project.start_date),
     });
 
     const submit = (e) => {

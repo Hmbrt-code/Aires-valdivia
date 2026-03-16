@@ -16,7 +16,7 @@ class Minute extends Model
     ];
 
     protected $casts = [
-        'date' => 'date',
+        'date' => 'datetime',
     ];
 
     public function project(): BelongsTo

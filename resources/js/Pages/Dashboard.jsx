@@ -1,5 +1,5 @@
 import AppLayout from '@/Components/Layout/AppLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 const FolderIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
@@ -32,6 +32,9 @@ const ArrowIcon = () => (
 );
 
 export default function Dashboard({ stats }) {
+    const { auth } = usePage().props;
+    const isAdmin = auth?.user?.roles?.some(r => r.name === 'admin');
+
     const cards = [
         {
             label: 'Proyectos Activos',
@@ -92,23 +95,25 @@ export default function Dashboard({ stats }) {
                 ))}
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-sm">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Acciones rápidas</h3>
-                <div className="space-y-1">
-                    {quickActions.map(action => (
-                        <Link
-                            key={action.href}
-                            href={action.href}
-                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors"
-                        >
-                            <span className="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                                <PlusIcon />
-                            </span>
-                            {action.label}
-                        </Link>
-                    ))}
+            {isAdmin && (
+                <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-sm">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Acciones rápidas</h3>
+                    <div className="space-y-1">
+                        {quickActions.map(action => (
+                            <Link
+                                key={action.href}
+                                href={action.href}
+                                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                            >
+                                <span className="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                    <PlusIcon />
+                                </span>
+                                {action.label}
+                            </Link>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </AppLayout>
     );
 }

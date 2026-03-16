@@ -15,12 +15,20 @@ export default function Index({ users }) {
 
             <div className="flex justify-between items-center mb-6">
                 <p className="text-sm text-gray-500">{users.total} usuario(s)</p>
-                <Link
-                    href="/admin/usuarios/create"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
-                >
-                    + Nuevo usuario
-                </Link>
+                <div className="flex gap-3">
+                    <Link
+                        href="/admin/usuarios/importar"
+                        className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                    >
+                        Importar CSV
+                    </Link>
+                    <Link
+                        href="/admin/usuarios/create"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                    >
+                        + Nuevo usuario
+                    </Link>
+                </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

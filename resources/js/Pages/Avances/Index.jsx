@@ -1,10 +1,23 @@
 import AppLayout from '@/Components/Layout/AppLayout';
 import Pagination from '@/Components/UI/Pagination';
 import ProgressBar from '@/Components/UI/ProgressBar';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
+const fmt = (val) => {
+    if (!val) return '—';
+    const d = new Date(val);
+    const dd = String(d.getUTCDate()).padStart(2, '0');
+    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const yyyy = d.getUTCFullYear();
+    const hh = String(d.getUTCHours()).padStart(2, '0');
+    const min = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
+};
+
 export default function Index({ updates, projects, filters }) {
+    const { auth } = usePage().props;
+    const isAdmin = auth?.user?.roles?.some(r => r.name === 'admin');
     const [projectId, setProjectId] = useState(filters.project_id ?? '');
 
     const applyFilters = () => {
@@ -50,9 +63,11 @@ export default function Index({ updates, projects, filters }) {
 
             <div className="flex justify-between items-center mb-4">
                 <p className="text-sm text-gray-500">{updates.total} avance(s)</p>
-                <Link href="/avances/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                    + Registrar avance
-                </Link>
+                {isAdmin && (
+                    <Link href="/avances/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                        + Registrar avance
+                    </Link>
+                )}
             </div>
 
             <div className="space-y-4">
@@ -63,12 +78,14 @@ export default function Index({ updates, projects, filters }) {
                                 <Link href={`/proyectos/${u.project_id}`} className="font-medium text-blue-600 hover:underline text-sm">
                                     {u.project?.name}
                                 </Link>
-                                <p className="text-xs text-gray-400 mt-0.5">{u.date} — {u.user?.name}</p>
+                                <p className="text-xs text-gray-400 mt-0.5">{fmt(u.date)} — {u.user?.name}</p>
                             </div>
-                            <div className="flex gap-3 text-sm">
-                                <Link href={`/avances/${u.id}/edit`} className="text-blue-500 hover:text-blue-700">Editar</Link>
-                                <button onClick={() => handleDelete(u.id)} className="text-red-500 hover:text-red-700">Eliminar</button>
-                            </div>
+                            {isAdmin && (
+                                <div className="flex gap-3 text-sm">
+                                    <Link href={`/avances/${u.id}/edit`} className="text-blue-500 hover:text-blue-700">Editar</Link>
+                                    <button onClick={() => handleDelete(u.id)} className="text-red-500 hover:text-red-700">Eliminar</button>
+                                </div>
+                            )}
                         </div>
                         <ProgressBar value={u.progress} />
                         <p className="text-sm text-gray-600 mt-2">{u.description}</p>

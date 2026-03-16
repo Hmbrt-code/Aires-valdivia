@@ -1,0 +1,5 @@
+name,email,password,role
+Juan Pérez,juan.perez@ejemplo.cl,password123,user
+María González,maria.gonzalez@ejemplo.cl,password123,user
+Carlos Administrador,carlos.admin@ejemplo.cl,password123,admin
+Ana López,ana.lopez@ejemplo.cl,clave1234,user

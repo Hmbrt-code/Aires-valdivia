@@ -1,6 +1,12 @@
 import AppLayout from '@/Components/Layout/AppLayout';
 import Pagination from '@/Components/UI/Pagination';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+
+const fmtDate = (val) => {
+    if (!val) return '—';
+    const d = new Date(val);
+    return `${String(d.getUTCDate()).padStart(2, '0')}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${d.getUTCFullYear()}`;
+};
 
 const statusBadge = (status) => (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -11,6 +17,9 @@ const statusBadge = (status) => (
 );
 
 export default function Index({ projects }) {
+    const { auth } = usePage().props;
+    const isAdmin = auth?.user?.roles?.some(r => r.name === 'admin');
+
     const handleDelete = (id) => {
         if (confirm('¿Eliminar este proyecto?')) {
             router.delete(`/proyectos/${id}`);
@@ -23,12 +32,14 @@ export default function Index({ projects }) {
 
             <div className="flex justify-between items-center mb-6">
                 <p className="text-sm text-gray-500">{projects.total} proyecto(s)</p>
-                <Link
-                    href="/proyectos/create"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
-                >
-                    + Nuevo proyecto
-                </Link>
+                {isAdmin && (
+                    <Link
+                        href="/proyectos/create"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                    >
+                        + Nuevo proyecto
+                    </Link>
+                )}
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -55,16 +66,20 @@ export default function Index({ projects }) {
                                     )}
                                 </td>
                                 <td className="px-6 py-4">{statusBadge(project.status)}</td>
-                                <td className="px-6 py-4 text-sm text-gray-600">{project.start_date}</td>
+                                <td className="px-6 py-4 text-sm text-gray-600">{fmtDate(project.start_date)}</td>
                                 <td className="px-6 py-4 text-sm text-gray-600">{project.minutes_count}</td>
                                 <td className="px-6 py-4 text-sm text-gray-600">{project.project_updates_count}</td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-3 text-sm">
                                         <Link href={`/proyectos/${project.id}`} className="text-gray-500 hover:text-gray-700">Ver</Link>
-                                        <Link href={`/proyectos/${project.id}/edit`} className="text-blue-500 hover:text-blue-700">Editar</Link>
-                                        <button onClick={() => handleDelete(project.id)} className="text-red-500 hover:text-red-700">
-                                            Eliminar
-                                        </button>
+                                        {isAdmin && (
+                                            <>
+                                                <Link href={`/proyectos/${project.id}/edit`} className="text-blue-500 hover:text-blue-700">Editar</Link>
+                                                <button onClick={() => handleDelete(project.id)} className="text-red-500 hover:text-red-700">
+                                                    Eliminar
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </td>
                             </tr>

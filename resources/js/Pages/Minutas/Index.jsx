@@ -1,9 +1,22 @@
 import AppLayout from '@/Components/Layout/AppLayout';
 import Pagination from '@/Components/UI/Pagination';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
+const fmt = (val) => {
+    if (!val) return '—';
+    const d = new Date(val);
+    const dd = String(d.getUTCDate()).padStart(2, '0');
+    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const yyyy = d.getUTCFullYear();
+    const hh = String(d.getUTCHours()).padStart(2, '0');
+    const min = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
+};
+
 export default function Index({ minutes, projects, filters }) {
+    const { auth } = usePage().props;
+    const isAdmin = auth?.user?.roles?.some(r => r.name === 'admin');
     const [projectId, setProjectId] = useState(filters.project_id ?? '');
     const [date, setDate] = useState(filters.date ?? '');
 
@@ -63,9 +76,11 @@ export default function Index({ minutes, projects, filters }) {
 
             <div className="flex justify-between items-center mb-4">
                 <p className="text-sm text-gray-500">{minutes.total} minuta(s)</p>
-                <Link href="/minutas/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                    + Nueva minuta
-                </Link>
+                {isAdmin && (
+                    <Link href="/minutas/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                        + Nueva minuta
+                    </Link>
+                )}
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -82,15 +97,19 @@ export default function Index({ minutes, projects, filters }) {
                     <tbody className="bg-white divide-y divide-gray-100">
                         {minutes.data.map(m => (
                             <tr key={m.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 text-sm font-medium text-gray-800">{m.title}</td>
+                                <td className="px-6 py-4 text-sm font-medium text-gray-800">
+                                    <Link href={`/minutas/${m.id}`} className="text-blue-600 hover:underline">{m.title}</Link>
+                                </td>
                                 <td className="px-6 py-4 text-sm text-gray-600">{m.project?.name}</td>
-                                <td className="px-6 py-4 text-sm text-gray-600">{m.date}</td>
+                                <td className="px-6 py-4 text-sm text-gray-600">{fmt(m.date)}</td>
                                 <td className="px-6 py-4 text-sm text-gray-600">{m.user?.name}</td>
                                 <td className="px-6 py-4 text-right">
-                                    <div className="flex items-center justify-end gap-3 text-sm">
-                                        <Link href={`/minutas/${m.id}/edit`} className="text-blue-500 hover:text-blue-700">Editar</Link>
-                                        <button onClick={() => handleDelete(m.id)} className="text-red-500 hover:text-red-700">Eliminar</button>
-                                    </div>
+                                    {isAdmin && (
+                                        <div className="flex items-center justify-end gap-3 text-sm">
+                                            <Link href={`/minutas/${m.id}/edit`} className="text-blue-500 hover:text-blue-700">Editar</Link>
+                                            <button onClick={() => handleDelete(m.id)} className="text-red-500 hover:text-red-700">Eliminar</button>
+                                        </div>
+                                    )}
                                 </td>
                             </tr>
                         ))}

@@ -12,7 +12,13 @@ class ProjectUpdateController extends Controller
 {
     public function index()
     {
+        $latestIds = \DB::table('project_updates')
+            ->select('id')
+            ->whereRaw('date = (SELECT MAX(date) FROM project_updates AS sub WHERE sub.project_id = project_updates.project_id)')
+            ->pluck('id');
+
         $updates = ProjectUpdate::with(['project', 'user'])
+            ->whereIn('id', $latestIds)
             ->when(request('project_id'), fn($q) => $q->where('project_id', request('project_id')))
             ->latest('date')
             ->paginate(15)

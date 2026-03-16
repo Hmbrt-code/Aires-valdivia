@@ -7,6 +7,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -82,5 +83,77 @@ class UserController extends Controller
 
         return redirect()->route('admin.usuarios.index')
             ->with('success', 'Usuario eliminado exitosamente.');
+    }
+
+    public function importForm()
+    {
+        return Inertia::render('Admin/Usuarios/Import');
+    }
+
+    public function importCsv(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'csv' => ['required', 'file', 'mimes:csv,txt', 'max:2048'],
+        ]);
+
+        $path = $request->file('csv')->getRealPath();
+        $handle = fopen($path, 'r');
+
+        $header = fgetcsv($handle); // skip header row
+        $validRoles = Role::pluck('name')->toArray();
+
+        $created = 0;
+        $errors = [];
+        $row = 1;
+
+        while (($line = fgetcsv($handle)) !== false) {
+            $row++;
+
+            if (count($line) < 3) {
+                $errors[] = "Fila {$row}: columnas insuficientes (se esperan name, email, password[, role]).";
+                continue;
+            }
+
+            [$name, $email, $password] = $line;
+            $role = trim($line[3] ?? 'user');
+            $name = trim($name);
+            $email = trim($email);
+            $password = trim($password);
+
+            $validator = Validator::make(
+                ['name' => $name, 'email' => $email, 'password' => $password, 'role' => $role],
+                [
+                    'name'     => ['required', 'string', 'max:255'],
+                    'email'    => ['required', 'email', 'unique:users,email'],
+                    'password' => ['required', 'min:8'],
+                    'role'     => ['required', 'in:' . implode(',', $validRoles)],
+                ]
+            );
+
+            if ($validator->fails()) {
+                foreach ($validator->errors()->all() as $msg) {
+                    $errors[] = "Fila {$row} ({$email}): {$msg}";
+                }
+                continue;
+            }
+
+            $user = User::create([
+                'name'     => $name,
+                'email'    => $email,
+                'password' => Hash::make($password),
+                'active'   => true,
+            ]);
+            $user->assignRole($role);
+            $created++;
+        }
+
+        fclose($handle);
+
+        return Inertia::render('Admin/Usuarios/Import', [
+            'result' => [
+                'created' => $created,
+                'errors'  => $errors,
+            ],
+        ]);
     }
 }

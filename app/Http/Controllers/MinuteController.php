@@ -28,6 +28,13 @@ class MinuteController extends Controller
         ]);
     }
 
+    public function show(Minute $minuta)
+    {
+        return Inertia::render('Minutas/Show', [
+            'minute' => $minuta->load(['project', 'user']),
+        ]);
+    }
+
     public function create()
     {
         $projects = Project::where('status', 'activo')->select('id', 'name')->get();

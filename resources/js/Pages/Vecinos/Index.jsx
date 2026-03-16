@@ -1,8 +1,11 @@
 import AppLayout from '@/Components/Layout/AppLayout';
 import Pagination from '@/Components/UI/Pagination';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 
 export default function Index({ vecinos }) {
+    const { auth } = usePage().props;
+    const isAdmin = auth?.user?.roles?.some(r => r.name === 'admin');
+
     const handleDelete = (id) => {
         if (confirm('¿Eliminar este vecino?')) {
             router.delete(`/vecinos/${id}`);
@@ -15,15 +18,17 @@ export default function Index({ vecinos }) {
 
             <div className="flex items-center justify-between mb-6">
                 <p className="text-sm text-gray-500">{vecinos.total} vecino{vecinos.total !== 1 ? 's' : ''} registrado{vecinos.total !== 1 ? 's' : ''}</p>
-                <Link
-                    href="/vecinos/create"
-                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Nuevo vecino
-                </Link>
+                {isAdmin && (
+                    <Link
+                        href="/vecinos/create"
+                        className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Nuevo vecino
+                    </Link>
+                )}
             </div>
 
             {vecinos.data.length === 0 ? (
@@ -65,15 +70,19 @@ export default function Index({ vecinos }) {
                                                 <Link href={`/vecinos/${vecino.id}`} className="text-gray-400 hover:text-blue-600 transition-colors">
                                                     Ver
                                                 </Link>
-                                                <Link href={`/vecinos/${vecino.id}/edit`} className="text-gray-400 hover:text-blue-600 transition-colors">
-                                                    Editar
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleDelete(vecino.id)}
-                                                    className="text-gray-400 hover:text-red-600 transition-colors"
-                                                >
-                                                    Eliminar
-                                                </button>
+                                                {isAdmin && (
+                                                    <>
+                                                        <Link href={`/vecinos/${vecino.id}/edit`} className="text-gray-400 hover:text-blue-600 transition-colors">
+                                                            Editar
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => handleDelete(vecino.id)}
+                                                            className="text-gray-400 hover:text-red-600 transition-colors"
+                                                        >
+                                                            Eliminar
+                                                        </button>
+                                                    </>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
