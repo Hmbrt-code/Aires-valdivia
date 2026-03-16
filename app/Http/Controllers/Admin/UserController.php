@@ -142,7 +142,7 @@ class UserController extends Controller
             $name     = trim($line[0]);
             $email    = trim($line[1]);
             $password = trim($line[2]);
-            $role     = trim($line[3] ?? 'user');
+            $role     = trim($line[3] ?? 'usuario');
 
             $validator = Validator::make(
                 ['name' => $name, 'email' => $email, 'password' => $password, 'role' => $role],

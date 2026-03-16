@@ -14,13 +14,13 @@
         <Cell><Data ss:Type="String">Juan Pérez</Data></Cell>
         <Cell><Data ss:Type="String">juan.perez@ejemplo.cl</Data></Cell>
         <Cell><Data ss:Type="String">password123</Data></Cell>
-        <Cell><Data ss:Type="String">user</Data></Cell>
+        <Cell><Data ss:Type="String">usuario</Data></Cell>
       </Row>
       <Row>
         <Cell><Data ss:Type="String">María González</Data></Cell>
         <Cell><Data ss:Type="String">maria.gonzalez@ejemplo.cl</Data></Cell>
         <Cell><Data ss:Type="String">password123</Data></Cell>
-        <Cell><Data ss:Type="String">user</Data></Cell>
+        <Cell><Data ss:Type="String">usuario</Data></Cell>
       </Row>
       <Row>
         <Cell><Data ss:Type="String">Carlos Administrador</Data></Cell>
@@ -32,7 +32,7 @@
         <Cell><Data ss:Type="String">Ana López</Data></Cell>
         <Cell><Data ss:Type="String">ana.lopez@ejemplo.cl</Data></Cell>
         <Cell><Data ss:Type="String">clave1234</Data></Cell>
-        <Cell><Data ss:Type="String">user</Data></Cell>
+        <Cell><Data ss:Type="String">usuario</Data></Cell>
       </Row>
     </Table>
   </Worksheet>

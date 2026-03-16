@@ -6,7 +6,7 @@ const columns = [
     { name: 'name',     req: true,  desc: 'Nombre completo del usuario.' },
     { name: 'email',    req: true,  desc: 'Correo electrónico. Debe ser único en el sistema.' },
     { name: 'password', req: true,  desc: 'Contraseña inicial. Mínimo 8 caracteres.' },
-    { name: 'role',     req: false, desc: 'Rol del usuario: admin o user. Si se omite, se asigna user.' },
+    { name: 'role',     req: false, desc: 'Rol del usuario: admin o usuario. Si se omite, se asigna usuario.' },
 ];
 
 export default function Import({ result }) {
