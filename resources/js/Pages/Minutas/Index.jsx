@@ -41,37 +41,41 @@ export default function Index({ minutes, projects, filters }) {
             <Head title="Minutas" />
 
             {/* Filtros */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex flex-wrap gap-3 items-end">
-                <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Proyecto</label>
-                    <select
-                        value={projectId}
-                        onChange={e => setProjectId(e.target.value)}
-                        className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
-                    >
-                        <option value="">Todos</option>
-                        {projects.map(p => (
-                            <option key={p.id} value={p.id}>{p.name}</option>
-                        ))}
-                    </select>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-end">
+                    <div className="flex-1 sm:flex-none">
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Proyecto</label>
+                        <select
+                            value={projectId}
+                            onChange={e => setProjectId(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                        >
+                            <option value="">Todos</option>
+                            {projects.map(p => (
+                                <option key={p.id} value={p.id}>{p.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex-1 sm:flex-none">
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Fecha</label>
+                        <input
+                            type="date"
+                            value={date}
+                            onChange={e => setDate(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                        />
+                    </div>
+                    <div className="flex gap-2">
+                        <button onClick={applyFilters} className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700">
+                            Filtrar
+                        </button>
+                        {(filters.project_id || filters.date) && (
+                            <button onClick={clearFilters} className="text-sm text-gray-500 hover:text-gray-700 px-2">
+                                Limpiar
+                            </button>
+                        )}
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Fecha</label>
-                    <input
-                        type="date"
-                        value={date}
-                        onChange={e => setDate(e.target.value)}
-                        className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
-                    />
-                </div>
-                <button onClick={applyFilters} className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700">
-                    Filtrar
-                </button>
-                {(filters.project_id || filters.date) && (
-                    <button onClick={clearFilters} className="text-sm text-gray-500 hover:text-gray-700">
-                        Limpiar
-                    </button>
-                )}
             </div>
 
             <div className="flex justify-between items-center mb-4">
@@ -83,7 +87,35 @@ export default function Index({ minutes, projects, filters }) {
                 )}
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {/* Cards móvil */}
+            <div className="block md:hidden space-y-3">
+                {minutes.data.map(m => (
+                    <div key={m.id} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                        <Link href={`/minutas/${m.id}`} className="text-blue-600 font-medium hover:underline text-sm block mb-1">
+                            {m.title}
+                        </Link>
+                        <p className="text-xs text-gray-500 mb-1">{m.project?.name}</p>
+                        <div className="flex flex-wrap gap-3 text-xs text-gray-400 mb-3">
+                            <span>{fmt(m.date)}</span>
+                            <span>por {m.user?.name}</span>
+                        </div>
+                        {isAdmin && (
+                            <div className="flex items-center gap-3 text-sm border-t border-gray-100 pt-3">
+                                <Link href={`/minutas/${m.id}/edit`} className="text-blue-500 hover:text-blue-700">Editar</Link>
+                                <button onClick={() => handleDelete(m.id)} className="text-red-500 hover:text-red-700">Eliminar</button>
+                            </div>
+                        )}
+                    </div>
+                ))}
+                {minutes.data.length === 0 && (
+                    <div className="bg-white rounded-xl border border-gray-200 px-6 py-12 text-center text-gray-400 text-sm">
+                        No se encontraron minutas.
+                    </div>
+                )}
+            </div>
+
+            {/* Tabla escritorio */}
+            <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>

@@ -36,6 +36,11 @@ const Icons = {
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
     ),
+    close: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    ),
 };
 
 const navItems = [
@@ -46,7 +51,7 @@ const navItems = [
     { label: 'Vecinos', href: '/vecinos', icon: Icons.vecinos },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ open, onClose }) {
     const { auth } = usePage().props;
     const isAdmin = auth?.user?.roles?.some(r => r.name === 'admin');
     const currentPath = window.location.pathname;
@@ -57,71 +62,92 @@ export default function Sidebar() {
             : currentPath.startsWith(href);
 
     return (
-        <aside className="w-64 h-screen sticky top-0 bg-gray-900 text-white flex flex-col">
-            <div className="px-6 py-5 border-b border-gray-700/60 flex items-center justify-center">
-                <img
-                    src="/images/logo.png"
-                    alt="Aires de Valdivia"
-                    className="h-14 w-auto object-contain"
-                />
-            </div>
+        <>
+            {/* Overlay móvil */}
+            <div
+                className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
+                    open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                }`}
+                onClick={onClose}
+            />
 
-            <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-                {navItems.map(item => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                            isActive(item.href)
-                                ? 'bg-blue-600 text-white shadow-sm'
-                                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                        }`}
+            <aside className={`fixed md:sticky top-0 left-0 z-50 md:z-auto h-screen w-64 bg-gray-900 text-white flex flex-col shrink-0 transition-transform duration-300 ease-in-out ${
+                open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+            }`}>
+                <div className="px-6 py-5 border-b border-gray-700/60 flex items-center justify-between">
+                    <img
+                        src="/images/logo.png"
+                        alt="Aires de Valdivia"
+                        className="h-14 w-auto object-contain"
+                    />
+                    <button
+                        onClick={onClose}
+                        className="md:hidden text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition-colors"
+                        aria-label="Cerrar menú"
                     >
-                        <span className="shrink-0">{item.icon}</span>
-                        {item.label}
-                    </Link>
-                ))}
+                        {Icons.close}
+                    </button>
+                </div>
 
-                {isAdmin && (
-                    <div className="pt-5">
-                        <p className="px-3 mb-1.5 text-xs uppercase text-gray-500 font-semibold tracking-wider">
-                            Administración
-                        </p>
+                <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+                    {navItems.map(item => (
                         <Link
-                            href="/admin/usuarios"
+                            key={item.href}
+                            href={item.href}
+                            onClick={onClose}
                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                                currentPath.startsWith('/admin/usuarios')
+                                isActive(item.href)
                                     ? 'bg-blue-600 text-white shadow-sm'
                                     : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                             }`}
                         >
-                            <span className="shrink-0">{Icons.usuarios}</span>
-                            Usuarios
+                            <span className="shrink-0">{item.icon}</span>
+                            {item.label}
                         </Link>
-                    </div>
-                )}
-            </nav>
+                    ))}
 
-            <div className="px-3 py-4 border-t border-gray-700/60">
-                <div className="flex items-center gap-3 px-3 py-2 mb-1">
-                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold shrink-0">
-                        {auth?.user?.name?.charAt(0).toUpperCase()}
+                    {isAdmin && (
+                        <div className="pt-5">
+                            <p className="px-3 mb-1.5 text-xs uppercase text-gray-500 font-semibold tracking-wider">
+                                Administración
+                            </p>
+                            <Link
+                                href="/admin/usuarios"
+                                onClick={onClose}
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                                    currentPath.startsWith('/admin/usuarios')
+                                        ? 'bg-blue-600 text-white shadow-sm'
+                                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                }`}
+                            >
+                                <span className="shrink-0">{Icons.usuarios}</span>
+                                Usuarios
+                            </Link>
+                        </div>
+                    )}
+                </nav>
+
+                <div className="px-3 py-4 border-t border-gray-700/60">
+                    <div className="flex items-center gap-3 px-3 py-2 mb-1">
+                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold shrink-0">
+                            {auth?.user?.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white truncate">{auth?.user?.name}</p>
+                            <p className="text-xs text-gray-400 truncate">{auth?.user?.email}</p>
+                        </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">{auth?.user?.name}</p>
-                        <p className="text-xs text-gray-400 truncate">{auth?.user?.email}</p>
-                    </div>
+                    <Link
+                        href="/logout"
+                        method="post"
+                        as="button"
+                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all duration-150"
+                    >
+                        {Icons.logout}
+                        Cerrar sesión
+                    </Link>
                 </div>
-                <Link
-                    href="/logout"
-                    method="post"
-                    as="button"
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all duration-150"
-                >
-                    {Icons.logout}
-                    Cerrar sesión
-                </Link>
-            </div>
-        </aside>
+            </aside>
+        </>
     );
 }

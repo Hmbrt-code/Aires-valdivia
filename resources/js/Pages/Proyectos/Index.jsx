@@ -8,7 +8,7 @@ const fmtDate = (val) => {
     return `${String(d.getUTCDate()).padStart(2, '0')}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${d.getUTCFullYear()}`;
 };
 
-const statusBadge = (status) => (
+const StatusBadge = ({ status }) => (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
         status === 'activo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
     }`}>
@@ -42,7 +42,46 @@ export default function Index({ projects }) {
                 )}
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {/* Cards móvil */}
+            <div className="block md:hidden space-y-3">
+                {projects.data.map(project => (
+                    <div key={project.id} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                        <div className="flex items-start justify-between mb-2">
+                            <Link href={`/proyectos/${project.id}`} className="text-blue-600 font-medium hover:underline text-sm flex-1 mr-2">
+                                {project.name}
+                            </Link>
+                            <StatusBadge status={project.status} />
+                        </div>
+                        {project.description && (
+                            <p className="text-xs text-gray-400 mb-3 line-clamp-2">{project.description}</p>
+                        )}
+                        <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-3">
+                            <span>Inicio: <strong className="text-gray-700">{fmtDate(project.start_date)}</strong></span>
+                            <span>Minutas: <strong className="text-gray-700">{project.minutes_count}</strong></span>
+                            <span>Avances: <strong className="text-gray-700">{project.project_updates_count}</strong></span>
+                        </div>
+                        <div className="flex items-center gap-3 text-sm border-t border-gray-100 pt-3">
+                            <Link href={`/proyectos/${project.id}`} className="text-gray-500 hover:text-gray-700">Ver</Link>
+                            {isAdmin && (
+                                <>
+                                    <Link href={`/proyectos/${project.id}/edit`} className="text-blue-500 hover:text-blue-700">Editar</Link>
+                                    <button onClick={() => handleDelete(project.id)} className="text-red-500 hover:text-red-700">
+                                        Eliminar
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                ))}
+                {projects.data.length === 0 && (
+                    <div className="bg-white rounded-xl border border-gray-200 px-6 py-12 text-center text-gray-400 text-sm">
+                        No hay proyectos registrados.
+                    </div>
+                )}
+            </div>
+
+            {/* Tabla escritorio */}
+            <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -65,7 +104,7 @@ export default function Index({ projects }) {
                                         <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{project.description}</p>
                                     )}
                                 </td>
-                                <td className="px-6 py-4">{statusBadge(project.status)}</td>
+                                <td className="px-6 py-4"><StatusBadge status={project.status} /></td>
                                 <td className="px-6 py-4 text-sm text-gray-600">{fmtDate(project.start_date)}</td>
                                 <td className="px-6 py-4 text-sm text-gray-600">{project.minutes_count}</td>
                                 <td className="px-6 py-4 text-sm text-gray-600">{project.project_updates_count}</td>
