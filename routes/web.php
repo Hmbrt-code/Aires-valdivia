@@ -5,6 +5,7 @@ use App\Http\Controllers\MinuteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectUpdateController;
+use App\Http\Controllers\VecinoController;
 use App\Models\Minute;
 use App\Models\Project;
 use App\Models\ProjectUpdate;
@@ -44,6 +45,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Avances
     Route::resource('avances', ProjectUpdateController::class)->parameters([
         'avances' => 'avance',
+    ]);
+
+    // Vecinos
+    Route::resource('vecinos', VecinoController::class)->parameters([
+        'vecinos' => 'vecino',
     ]);
 
     // Admin
