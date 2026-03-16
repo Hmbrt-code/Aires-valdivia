@@ -13,12 +13,12 @@ export default function Sidebar() {
     const currentPath = window.location.pathname;
 
     return (
-        <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
+        <aside className="w-64 h-screen sticky top-0 bg-gray-900 text-white flex flex-col">
             <div className="p-6 border-b border-gray-700">
                 <h1 className="text-lg font-bold leading-tight">Gestión de Proyectos</h1>
             </div>
 
-            <nav className="flex-1 p-4 space-y-1">
+            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                 {navItems.map(item => (
                     <Link
                         key={item.href}
