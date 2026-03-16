@@ -88,37 +88,62 @@ class UserController extends Controller
 
     public function downloadTemplate()
     {
-        $html = '
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
-<head><meta charset="UTF-8"></head>
-<body>
-<table>
-<tr>
-  <th>nombre</th>
-  <th>email</th>
-  <th>contraseña</th>
-  <th>rol</th>
-</tr>
-<tr>
-  <td>Juan Pérez</td>
-  <td>juan@ejemplo.cl</td>
-  <td>password123</td>
-  <td>vecino</td>
-</tr>
-<tr>
-  <td>María López</td>
-  <td>maria@ejemplo.cl</td>
-  <td>password456</td>
-  <td>admin</td>
-</tr>
-</table>
-</body></html>';
+        $rows = [
+            ['nombre', 'email', 'contraseña', 'rol'],
+            ['Juan Pérez', 'juan@ejemplo.cl', 'password123', 'vecino'],
+            ['María López', 'maria@ejemplo.cl', 'password456', 'admin'],
+        ];
 
-        return response($html, 200, [
-            'Content-Type'        => 'application/vnd.ms-excel; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="plantilla_usuarios.xls"',
-            'Cache-Control'       => 'no-cache',
-        ]);
+        $path = tempnam(sys_get_temp_dir(), 'xlsx_');
+
+        $zip = new \ZipArchive();
+        $zip->open($path, \ZipArchive::OVERWRITE);
+
+        $zip->addFromString('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>');
+
+        $zip->addFromString('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>');
+
+        $zip->addFromString('xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+</Relationships>');
+
+        $zip->addFromString('xl/workbook.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/sheet" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="Usuarios" sheetId="1" r:id="rId1"/></sheets>
+</workbook>');
+
+        $sheetRows = '';
+        foreach ($rows as $ri => $row) {
+            $rowNum = $ri + 1;
+            $cells = '';
+            foreach ($row as $ci => $value) {
+                $col = chr(65 + $ci);
+                $escaped = htmlspecialchars((string) $value, ENT_XML1, 'UTF-8');
+                $cells .= "<c r=\"{$col}{$rowNum}\" t=\"inlineStr\"><is><t>{$escaped}</t></is></c>";
+            }
+            $sheetRows .= "<row r=\"{$rowNum}\">{$cells}</row>";
+        }
+
+        $zip->addFromString('xl/worksheets/sheet1.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/sheet">
+  <sheetData>' . $sheetRows . '</sheetData>
+</worksheet>');
+
+        $zip->close();
+
+        return response()->download($path, 'plantilla_usuarios.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend();
     }
 
     public function importForm()

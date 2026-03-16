@@ -112,7 +112,7 @@ export default function Import() {
                     <div className="border-2 border-dashed border-gray-300 rounded-lg px-6 py-8 text-center hover:border-blue-400 transition-colors">
                         <input
                             type="file"
-                            accept=".csv,.txt"
+                            accept=".csv,.txt,.xlsx"
                             onChange={handleFile}
                             className="hidden"
                             id="csv-input"
@@ -122,7 +122,7 @@ export default function Import() {
                             <p className="text-sm font-medium text-gray-700">
                                 {data.archivo ? data.archivo.name : 'Haz clic para seleccionar un archivo CSV'}
                             </p>
-                            <p className="text-xs text-gray-400 mt-1">CSV o TXT, máximo 2 MB</p>
+                            <p className="text-xs text-gray-400 mt-1">CSV, TXT o XLSX, máximo 2 MB</p>
                         </label>
                     </div>
                     {errors.archivo && <p className="mt-1 text-xs text-red-600">{errors.archivo}</p>}
