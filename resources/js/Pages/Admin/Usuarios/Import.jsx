@@ -18,8 +18,10 @@ export default function Import() {
 
         const reader = new FileReader();
         reader.onload = (ev) => {
-            const lines = ev.target.result.split('\n').filter(Boolean);
-            setPreview(lines.slice(0, 6)); // header + first 5 rows
+            const text = ev.target.result;
+            const sep = text.includes(';') ? ';' : ',';
+            const lines = text.split('\n').filter(Boolean).slice(0, 6);
+            setPreview(lines.map(l => l.split(sep)));
         };
         reader.readAsText(file);
     };
@@ -30,7 +32,9 @@ export default function Import() {
     };
 
     const downloadTemplate = () => {
-        const csv = 'nombre,email,contraseña,rol\nJuan Pérez,juan@ejemplo.cl,password123,vecino\n';
+        // Semicolon separator for Excel in Spanish locale + UTF-8 BOM
+        const bom = '\uFEFF';
+        const csv = bom + 'nombre;email;contraseña;rol\nJuan Pérez;juan@ejemplo.cl;password123;vecino\nMaría López;maria@ejemplo.cl;password456;admin\n';
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -142,16 +146,13 @@ export default function Import() {
                             <div className="overflow-x-auto rounded-lg border border-gray-200">
                                 <table className="min-w-full text-xs">
                                     <tbody>
-                                        {preview.map((line, i) => {
-                                            const cols = line.split(',');
-                                            return (
-                                                <tr key={i} className={i === 0 ? 'bg-gray-50 font-semibold' : 'border-t border-gray-100'}>
-                                                    {cols.map((col, j) => (
-                                                        <td key={j} className="px-3 py-1.5 text-gray-700">{col}</td>
-                                                    ))}
-                                                </tr>
-                                            );
-                                        })}
+                                        {preview.map((cols, i) => (
+                                            <tr key={i} className={i === 0 ? 'bg-gray-50 font-semibold' : 'border-t border-gray-100'}>
+                                                {cols.map((col, j) => (
+                                                    <td key={j} className="px-3 py-1.5 text-gray-700">{col}</td>
+                                                ))}
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>

@@ -98,16 +98,21 @@ class UserController extends Controller
         ]);
 
         $path = $request->file('archivo')->getRealPath();
+
+        // Detect separator (semicolon for Spanish Excel, comma otherwise)
+        $firstLine = file($path, FILE_IGNORE_NEW_LINES)[0] ?? '';
+        $separator = str_contains($firstLine, ';') ? ';' : ',';
+
         $handle = fopen($path, 'r');
 
         // Skip header row
-        fgetcsv($handle);
+        fgetcsv($handle, 0, $separator);
 
         $created = 0;
         $errors = [];
         $row = 1;
 
-        while (($data = fgetcsv($handle)) !== false) {
+        while (($data = fgetcsv($handle, 0, $separator)) !== false) {
             $row++;
             if (count($data) < 4) {
                 $errors[] = "Fila {$row}: faltan columnas (se esperan 4: nombre, email, contraseña, rol).";
