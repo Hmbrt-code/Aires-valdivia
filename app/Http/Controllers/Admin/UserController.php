@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -82,5 +84,72 @@ class UserController extends Controller
 
         return redirect()->route('admin.usuarios.index')
             ->with('success', 'Usuario eliminado exitosamente.');
+    }
+
+    public function importForm()
+    {
+        return Inertia::render('Admin/Usuarios/Import');
+    }
+
+    public function importCsv(Request $request)
+    {
+        $request->validate([
+            'archivo' => ['required', 'file', 'mimes:csv,txt', 'max:2048'],
+        ]);
+
+        $path = $request->file('archivo')->getRealPath();
+        $handle = fopen($path, 'r');
+
+        // Skip header row
+        fgetcsv($handle);
+
+        $created = 0;
+        $errors = [];
+        $row = 1;
+
+        while (($data = fgetcsv($handle)) !== false) {
+            $row++;
+            if (count($data) < 4) {
+                $errors[] = "Fila {$row}: faltan columnas (se esperan 4: nombre, email, contraseña, rol).";
+                continue;
+            }
+
+            [$nombre, $email, $password, $rol] = array_map('trim', $data);
+
+            $validator = Validator::make(
+                ['nombre' => $nombre, 'email' => $email, 'password' => $password, 'rol' => $rol],
+                [
+                    'nombre'   => ['required', 'string', 'max:255'],
+                    'email'    => ['required', 'email', 'unique:users,email'],
+                    'password' => ['required', 'string', 'min:8'],
+                    'rol'      => ['required', 'in:admin,vecino'],
+                ]
+            );
+
+            if ($validator->fails()) {
+                $errors[] = "Fila {$row} ({$email}): " . implode(' ', $validator->errors()->all());
+                continue;
+            }
+
+            $user = User::create([
+                'name'     => $nombre,
+                'email'    => $email,
+                'password' => Hash::make($password),
+                'active'   => true,
+            ]);
+            $user->assignRole($rol);
+            $created++;
+        }
+
+        fclose($handle);
+
+        $message = "{$created} usuario(s) importado(s) correctamente.";
+        if ($errors) {
+            $message .= ' ' . count($errors) . ' fila(s) con errores.';
+        }
+
+        return redirect()->route('admin.usuarios.import.form')
+            ->with('success', $message)
+            ->with('import_errors', $errors);
     }
 }
