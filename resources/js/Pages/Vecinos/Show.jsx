@@ -1,5 +1,5 @@
 import AppLayout from '@/Components/Layout/AppLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 const Row = ({ label, value }) => (
     <div className="py-3 grid grid-cols-3 gap-4">
@@ -16,6 +16,9 @@ const SectionTitle = ({ number, title }) => (
 );
 
 export default function Show({ vecino }) {
+    const { auth } = usePage().props;
+    const isAdmin = auth?.user?.roles?.some(r => r.name === 'admin');
+
     const formatCurrency = (val) =>
         val ? new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(val) : null;
 
@@ -35,9 +38,11 @@ export default function Show({ vecino }) {
                         </span>
                     )}
                     <div className="flex items-center gap-3 ml-auto">
-                        <Link href={`/vecinos/${vecino.id}/edit`} className="inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                            Editar
-                        </Link>
+                        {isAdmin && (
+                            <Link href={`/vecinos/${vecino.id}/edit`} className="inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                                Editar
+                            </Link>
+                        )}
                         <Link href="/vecinos" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
                             Volver al listado
                         </Link>
