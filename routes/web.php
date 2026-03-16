@@ -32,41 +32,41 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Proyectos — lectura para todos, escritura solo admin
-    Route::resource('proyectos', ProjectController::class)
-        ->parameters(['proyectos' => 'proyecto'])
-        ->only(['index', 'show']);
+    // Proyectos — escritura primero (create/edit específicos antes que {proyecto})
     Route::resource('proyectos', ProjectController::class)
         ->parameters(['proyectos' => 'proyecto'])
         ->except(['index', 'show'])
         ->middleware('role:admin');
+    Route::resource('proyectos', ProjectController::class)
+        ->parameters(['proyectos' => 'proyecto'])
+        ->only(['index', 'show']);
 
-    // Minutas — lectura para todos, escritura solo admin
+    // Minutas
+    Route::resource('minutas', MinuteController::class)
+        ->parameters(['minutas' => 'minuta'])
+        ->except(['index', 'show'])
+        ->middleware('role:admin');
     Route::resource('minutas', MinuteController::class)
         ->parameters(['minutas' => 'minuta'])
         ->only(['index', 'show']);
-    Route::resource('minutas', MinuteController::class)
-        ->parameters(['minutas' => 'minuta'])
-        ->except(['index', 'show'])
-        ->middleware('role:admin');
 
-    // Avances — lectura para todos, escritura solo admin
-    Route::resource('avances', ProjectUpdateController::class)
-        ->parameters(['avances' => 'avance'])
-        ->only(['index', 'show']);
+    // Avances
     Route::resource('avances', ProjectUpdateController::class)
         ->parameters(['avances' => 'avance'])
         ->except(['index', 'show'])
         ->middleware('role:admin');
-
-    // Vecinos — lectura para todos, escritura solo admin
-    Route::resource('vecinos', VecinoController::class)
-        ->parameters(['vecinos' => 'vecino'])
+    Route::resource('avances', ProjectUpdateController::class)
+        ->parameters(['avances' => 'avance'])
         ->only(['index', 'show']);
+
+    // Vecinos
     Route::resource('vecinos', VecinoController::class)
         ->parameters(['vecinos' => 'vecino'])
         ->except(['index', 'show'])
         ->middleware('role:admin');
+    Route::resource('vecinos', VecinoController::class)
+        ->parameters(['vecinos' => 'vecino'])
+        ->only(['index', 'show']);
 
     // Admin
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
