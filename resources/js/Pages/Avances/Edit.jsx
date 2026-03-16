@@ -2,12 +2,25 @@ import AppLayout from '@/Components/Layout/AppLayout';
 import ProgressBar from '@/Components/UI/ProgressBar';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+const toDatetimeLocal = (val) => {
+    if (!val) return '';
+    // Expects "2026-02-07T14:30:00.000000Z" or "2026-02-07"
+    const iso = val.includes('T') ? val : val + 'T00:00:00Z';
+    const d = new Date(iso);
+    const yyyy = d.getUTCFullYear();
+    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(d.getUTCDate()).padStart(2, '0');
+    const hh = String(d.getUTCHours()).padStart(2, '0');
+    const min = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+};
+
 export default function Edit({ update, projects }) {
     const { data, setData, put, processing, errors } = useForm({
         project_id: update.project_id,
         progress: update.progress,
         description: update.description,
-        date: update.date,
+        date: toDatetimeLocal(update.date),
     });
 
     const submit = (e) => {
@@ -56,9 +69,9 @@ export default function Edit({ update, projects }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha *</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha y hora *</label>
                             <input
-                                type="date"
+                                type="datetime-local"
                                 value={data.date}
                                 onChange={e => setData('date', e.target.value)}
                                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"

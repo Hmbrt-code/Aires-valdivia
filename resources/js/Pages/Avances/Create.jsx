@@ -56,9 +56,9 @@ export default function Create({ projects }) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha *</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha y hora *</label>
                             <input
-                                type="date"
+                                type="datetime-local"
                                 value={data.date}
                                 onChange={e => setData('date', e.target.value)}
                                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"

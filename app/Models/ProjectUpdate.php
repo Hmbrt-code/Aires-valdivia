@@ -16,7 +16,7 @@ class ProjectUpdate extends Model
     ];
 
     protected $casts = [
-        'date' => 'date',
+        'date' => 'datetime',
         'progress' => 'integer',
     ];
 

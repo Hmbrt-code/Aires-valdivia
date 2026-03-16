@@ -4,6 +4,17 @@ import ProgressBar from '@/Components/UI/ProgressBar';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
+const fmt = (val) => {
+    if (!val) return '—';
+    const d = new Date(val);
+    const dd = String(d.getUTCDate()).padStart(2, '0');
+    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const yyyy = d.getUTCFullYear();
+    const hh = String(d.getUTCHours()).padStart(2, '0');
+    const min = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
+};
+
 export default function Index({ updates, projects, filters }) {
     const [projectId, setProjectId] = useState(filters.project_id ?? '');
 
@@ -63,7 +74,7 @@ export default function Index({ updates, projects, filters }) {
                                 <Link href={`/proyectos/${u.project_id}`} className="font-medium text-blue-600 hover:underline text-sm">
                                     {u.project?.name}
                                 </Link>
-                                <p className="text-xs text-gray-400 mt-0.5">{u.date} — {u.user?.name}</p>
+                                <p className="text-xs text-gray-400 mt-0.5">{fmt(u.date)} — {u.user?.name}</p>
                             </div>
                             <div className="flex gap-3 text-sm">
                                 <Link href={`/avances/${u.id}/edit`} className="text-blue-500 hover:text-blue-700">Editar</Link>
