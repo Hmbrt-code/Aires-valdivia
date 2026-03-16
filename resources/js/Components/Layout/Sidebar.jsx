@@ -5,6 +5,7 @@ const navItems = [
     { label: 'Proyectos', href: '/proyectos', icon: '📁' },
     { label: 'Minutas', href: '/minutas', icon: '📝' },
     { label: 'Avances', href: '/avances', icon: '📊' },
+    { label: 'Vecinos', href: '/vecinos', icon: '🏘️' },
 ];
 
 export default function Sidebar() {
