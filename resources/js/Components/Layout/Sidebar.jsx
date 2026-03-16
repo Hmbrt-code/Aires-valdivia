@@ -19,6 +19,26 @@ export default function Sidebar() {
                 <h1 className="text-lg font-bold leading-tight">Gestión de Proyectos</h1>
             </div>
 
+            <div className="px-4 py-3 border-b border-gray-700">
+                <div className="flex items-center gap-3 px-2 py-1">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold shrink-0">
+                        {auth?.user?.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{auth?.user?.name}</p>
+                        <p className="text-xs text-gray-400 truncate">{auth?.user?.email}</p>
+                    </div>
+                </div>
+                <Link
+                    href="/logout"
+                    method="post"
+                    as="button"
+                    className="mt-1 w-full text-left px-4 py-1.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                    Cerrar sesión
+                </Link>
+            </div>
+
             <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                 {navItems.map(item => (
                     <Link
@@ -56,26 +76,6 @@ export default function Sidebar() {
                     </div>
                 )}
             </nav>
-
-            <div className="p-4 border-t border-gray-700">
-                <div className="flex items-center gap-3 px-2 py-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold">
-                        {auth?.user?.name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{auth?.user?.name}</p>
-                        <p className="text-xs text-gray-400 truncate">{auth?.user?.email}</p>
-                    </div>
-                </div>
-                <Link
-                    href="/logout"
-                    method="post"
-                    as="button"
-                    className="mt-2 w-full text-left px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
-                >
-                    Cerrar sesión
-                </Link>
-            </div>
         </aside>
     );
 }
