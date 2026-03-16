@@ -83,7 +83,7 @@ export default function Import({ result }) {
                             <input
                                 ref={fileRef}
                                 type="file"
-                                accept=".csv,text/csv"
+                                accept=".csv,.xls,text/csv"
                                 onChange={e => setData('csv', e.target.files[0])}
                                 className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                             />

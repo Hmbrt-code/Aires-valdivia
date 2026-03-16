@@ -93,32 +93,56 @@ class UserController extends Controller
     public function importCsv(\Illuminate\Http\Request $request)
     {
         $request->validate([
-            'csv' => ['required', 'file', 'mimes:csv,txt', 'max:2048'],
+            'csv' => ['required', 'file', 'mimes:csv,txt,xls,xml', 'max:2048'],
         ]);
 
-        $path = $request->file('csv')->getRealPath();
-        $handle = fopen($path, 'r');
+        $file = $request->file('csv');
+        $path = $file->getRealPath();
+        $content = file_get_contents($path);
 
-        $header = fgetcsv($handle); // skip header row
         $validRoles = Role::pluck('name')->toArray();
-
         $created = 0;
         $errors = [];
-        $row = 1;
+        $rows = [];
 
-        while (($line = fgetcsv($handle)) !== false) {
-            $row++;
+        // Detect SpreadsheetML (.xls XML) vs plain CSV
+        if (str_contains($content, 'schemas-microsoft-com:office:spreadsheet')) {
+            // Parse SpreadsheetML
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($content);
+            if (!$xml) {
+                return back()->withErrors(['csv' => 'El archivo XLS no pudo ser leído.']);
+            }
+            $xml->registerXPathNamespace('ss', 'urn:schemas-microsoft-com:office:spreadsheet');
+            $xmlRows = $xml->xpath('//ss:Row');
+            foreach ($xmlRows as $i => $xmlRow) {
+                if ($i === 0) continue; // skip header
+                $cells = $xmlRow->xpath('ss:Cell/ss:Data');
+                $rows[] = array_map('strval', $cells);
+            }
+        } else {
+            // Parse CSV — detect separator
+            $firstLine = strtok($content, "\n");
+            $separator = str_contains($firstLine, ';') ? ';' : ',';
+            $handle = fopen($path, 'r');
+            fgetcsv($handle, 0, $separator); // skip header
+            while (($line = fgetcsv($handle, 0, $separator)) !== false) {
+                $rows[] = $line;
+            }
+            fclose($handle);
+        }
 
+        foreach ($rows as $i => $line) {
+            $rowNum = $i + 2;
             if (count($line) < 3) {
-                $errors[] = "Fila {$row}: columnas insuficientes (se esperan name, email, password[, role]).";
+                $errors[] = "Fila {$rowNum}: columnas insuficientes (se esperan name, email, password[, role]).";
                 continue;
             }
 
-            [$name, $email, $password] = $line;
-            $role = trim($line[3] ?? 'user');
-            $name = trim($name);
-            $email = trim($email);
-            $password = trim($password);
+            $name     = trim($line[0]);
+            $email    = trim($line[1]);
+            $password = trim($line[2]);
+            $role     = trim($line[3] ?? 'user');
 
             $validator = Validator::make(
                 ['name' => $name, 'email' => $email, 'password' => $password, 'role' => $role],
@@ -132,7 +156,7 @@ class UserController extends Controller
 
             if ($validator->fails()) {
                 foreach ($validator->errors()->all() as $msg) {
-                    $errors[] = "Fila {$row} ({$email}): {$msg}";
+                    $errors[] = "Fila {$rowNum} ({$email}): {$msg}";
                 }
                 continue;
             }
@@ -146,8 +170,6 @@ class UserController extends Controller
             $user->assignRole($role);
             $created++;
         }
-
-        fclose($handle);
 
         return Inertia::render('Admin/Usuarios/Import', [
             'result' => [
